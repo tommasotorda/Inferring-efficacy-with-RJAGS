@@ -3,9 +3,11 @@ On March 22, 2021, Astrazeneca released the results of the phase III trial of th
 
 
 Bayesian Network for Symptomatic:
+
 <img width="425" alt="Schermata 2021-05-10 alle 17 39 45" src="https://user-images.githubusercontent.com/83967142/117687593-3c60ae80-b1b8-11eb-928c-b71d45d766fb.png">
 
 Bayesian Network for Severe: 
+
 <img width="533" alt="Schermata 2021-05-10 alle 17 39 26" src="https://user-images.githubusercontent.com/83967142/117687525-2a7f0b80-b1b8-11eb-8e8e-a4096c2bb097.png">
 
 [1] AstraZeneca PLC, News Release, 22 March 2021,https://www.astrazeneca.com/media-centre/press-releases/2021/astrazeneca-us-vaccine-trial-met-primary-endpoint.html
