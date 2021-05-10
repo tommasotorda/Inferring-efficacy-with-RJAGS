@@ -1,0 +1,50 @@
+nr = 100000
+
+#-------------  JAGS model --------------------------------------
+library(rjags)
+model = "tmp_model.bug"    # name of the model file ('temporary')
+write("
+model {
+
+  nP.I   ~ dbin(pA, nP)          
+  nV.A  ~ dbin(pA, nV)         
+
+  pA ~ dbeta(1,1)
+  nV.I ~ dbin(ffe, nV.A)      
+  ffe ~ dbeta(1,1)
+  eff <- 1 - ffe          # efficacy of vaccine is 1 minus the probabily of being infected
+}
+", model)
+
+
+nP   = 10816     # placebo     
+nV   = 21633     # vaccinated      
+nP.I = 99        # infected placebo 
+nV.I = 42        # infected vaccinated
+
+#------------  JAGS call via rjags ------------------------------
+data <- list(nP=nP, nV=nV, nP.I=nP.I, nV.I=nV.I)
+jm <- jags.model(model, data)
+update(jm, 100)
+to.monitor <-  c('pA', 'eff', 'nV.A')
+chain <- coda.samples(jm, to.monitor, n.iter=nr)
+chain.df <- as.data.frame( as.mcmc(chain) )
+
+#-------------- Results -------------------------------------------
+print(summary(chain))
+plot(chain)
+
+hist(chain.df$eff, nc=100, col='cyan', freq=FALSE,
+     xlab='efficacy', main='Astrazeneca')
+abline(v=0.794, col='blue')                  # vertical line on the modal value claimed by Astrazeneca
+
+library(bayestestR)
+ci_hdi <- ci(chain, ci=0.95, digits =4)
+print(ci_hdi)
+
+h <- hist(chain.df$eff, nc=100, col='cyan', freq=FALSE,
+     xlab='efficacy', main='Efficacy symptomatic COVID-19')
+mode <- h$mids[h$counts == max(h$counts)]
+plot(density(chain.df$eff), main = "Efficacy symptomatic COVID-19",  xlab= expression(epsilon [2]), ylab = expression(paste("f(", epsilon [2], ")")))
+abline(v = 0.794, col='blue', lty = "dashed")
+abline(v = mode, col = "red", lty = "dashed")
