@@ -1,0 +1,61 @@
+nr = 100000
+
+
+for (i in 1:4){
+#-------------  JAGS model --------------------------------------
+library(rjags)
+model = "tmp_model.bug"    # name of the model file ('temporary')
+write("
+model {
+  nP.I   ~ dbin(pA, nP)          
+  nV.A  ~ dbin(pA, nV)    
+
+  pA ~ dbeta(1,1)
+  nV.I ~ dbin(ffe, nV.A)      
+  ffe ~ dbeta(1,1)
+  eff <- 1 - ffe
+
+  nP.AS   ~ dbin(pAs, nP.I)          
+  nV.AS  ~ dbin(pAs, nV.I)         
+
+  pAs ~ dbeta(1,1)
+  nP.S ~ dnorm(nP.AS, sigma)
+  nV.S ~ dbin(ffe1, nV.AS)      
+  ffe1 ~ dbeta(1,1)
+  eff1 <- 1 - ffe1
+}
+", model)
+
+
+nP   = 10816     # placebo     
+nV   = 21633     # vaccinated      
+nP.I = 99        # infected placebo 
+nV.I = 42        # infected vaccinated
+nV.S = 0
+nP.S = 10*i
+sigma = 3
+#------------  JAGS call via rjags ------------------------------
+data <- list(nP=nP, nV=nV, nP.I=nP.I, nV.I=nV.I, nV.S=nV.S, nP.S = nP.S, sigma = sigma)
+jm <- jags.model(model, data)
+update(jm, 100)
+to.monitor <-  c('pA', 'eff', 'nV.A', 'pAs', 'eff1', 'nV.AS', 'nP.S', 'nP.AS')
+chain <- coda.samples(jm, to.monitor, n.iter=nr)
+chain.df <- as.data.frame( as.mcmc(chain) )
+
+#------------ Results -------------------------------------------
+print(summary(chain))    
+ci_hdi <- ci(chain, ci=0.95, digits =4)
+print(ci_hdi)
+    
+if(i==1){
+plot(density(chain.df$eff1), cex = 1,  col = i, main = "Efficacy against severe disease",  xlab= expression(epsilon [2]), ylab = expression(paste("f(", epsilon [2], ")")))
+}
+else{
+par(new=TRUE)
+plot(density(chain.df$eff1), cex = 1, main ="", xlab ="", ylab = "", col = i, axes = 0)
+}
+}           # closing for cycle
+
+legend("topleft", legend=c("nP.S = 10", "nP.S = 20", "nP.S = 30", "nP.S = 40"),
+       col=c(1,2,3,4),lty=1, cex=0.8,
+       title="Line types", text.font=4)
