@@ -4,3 +4,6 @@ On March 22, 2021, Astrazeneca released the results of the phase III trial of th
 [1] AstraZeneca PLC, News Release, 22 March 2021,https://www.astrazeneca.com/media-centre/press-releases/2021/astrazeneca-us-vaccine-trial-met-primary-endpoint.html
 
 [2] G. D’Agostini and A. Esposito, “What is the probability that a vaccinated person is shielded from Covid-19? A Bayesian MCMC based reanalysis of published data with emphasis on what should be reported as ‘efficacy”’, https://arxiv.org/abs/2102.11022v1
+
+
+[immagine](https://imgur.com/a/27e2tYD)
